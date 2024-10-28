@@ -1,0 +1,70 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    animation: gradientBackground 15s ease infinite;
+}
+
+@keyframes gradientBackground {
+    0% {
+        background: linear-gradient(120deg, #3d0101 0%, #fbf7f7 100%);
+    }
+    50% {
+        background: linear-gradient(120deg, #3d0101 0%, #fbf7f7 100%);
+    }
+    100% {
+        background: linear-gradient(120deg, #3d0101 0%, #fbf7f7 100%);
+    }
+}
+
+
+
+.cart-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.cart-table th, .cart-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-table th {
+    background-color: #f8f8f8;
+}
+
+.cart-table td {
+    text-align: center;
+}
+
+.cart-table .item-quantity {
+    margin: 0 10px;
+}
+
+button {
+    background-color: #3d0101;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:hover {
+    background-color: #fda085;
+}
+
+.decrement-btn, .increment-btn {
+    font-size: 14px;
+}
+
+
+
