@@ -355,7 +355,9 @@ $conn->close();
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Preferred Contact</th>
+                <th>Role</th> 
                 <th>Action</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -366,6 +368,7 @@ $conn->close();
                 <td><?php echo $user['email']; ?></td>
                 <td><?php echo $user['phone']; ?></td>
                 <td><?php echo $user['preferred_contact']; ?></td>
+                <td><?php echo $user['role']; ?></td> 
                 <td>
                     <form method="post" style="display:inline;">
                         <input type="hidden" name="action" value="delete_user">

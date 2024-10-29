@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <style>
+        /* Styling for the receipt */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        .receipt-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 120px;
+            height: auto;
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cart-table th, .cart-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .cart-table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .print-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container" id="receipt-content">
+        <div class="logo">
+            <img src="/RibsCircle_System/assets/images/Logo.png" alt="Logo">
+        </div>
+        <div class="receipt-header">
+            <h2>Receipt</h2>
+            <p>Thank you for shopping with Ribs Circle!</p>
+        </div>
+
+        <!-- Cart Table -->
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="cart-items">
+                <!-- Cart items will be inserted here -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="3">Total</td>
+                    <td id="total-price">R0.00</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Print Button -->
+        <button class="print-btn" onclick="window.print()">Print Receipt</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+    <script>
+        // Initialize EmailJS
+        (function() {
+            emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS user ID
+        })();
+
+        // Function to populate the receipt with data from local storage
+        function populateReceipt() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const totalPriceElement = document.getElementById('total-price');
+            
+            // Retrieve cart from local storage
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let total = 0;
+
+            // Clear existing rows in case of re-render
+            cartItemsContainer.innerHTML = '';
+
+            // Loop through each item and create table rows
+            cart.forEach(item => {
+                // Convert item.price to a number if it's stored as a string
+                const itemPrice = parseFloat(item.price);
+                const itemTotal = item.quantity * itemPrice;
+                total += itemTotal;
+
+                // Create a table row for each item
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.description}</td>
+                    <td>${item.quantity}</td>
+                    <td>R${itemPrice.toFixed(2)}</td>
+                    <td>R${itemTotal.toFixed(2)}</td>
+                `;
+                cartItemsContainer.appendChild(row);
+            });
+
+            // Update the total price in the receipt
+            totalPriceElement.textContent = `R${total.toFixed(2)}`;
+        }
+
+        // Populate the receipt on page load
+        document.addEventListener('DOMContentLoaded', populateReceipt);
+
+        // Function to send the receipt as an email
+        function sendMail() {
+    // Retrieve recipient email and cart data from local storage
+    const recipientEmail = localStorage.getItem('recipientEmail'); // Assumes recipient email is saved as 'recipientEmail'
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let total = 0;
+
+    // Create HTML structure for the receipt content
+    let receiptContent = `
+        <div style="font-family: Arial, sans-serif;">
+            <h2>Receipt</h2>
+            <p>Thank you for shopping with us!</p>
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #007bff; color: white;">
+                        <th style="padding: 8px; border: 1px solid #ddd;">Item</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Quantity</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+    // Generate rows for each item in the cart
+    cart.forEach(item => {
+        const itemPrice = parseFloat(item.price);
+        const itemTotal = item.quantity * itemPrice;
+        total += itemTotal;
+
+        receiptContent += `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">${item.description}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${item.quantity}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">R${itemPrice.toFixed(2)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">R${itemTotal.toFixed(2)}</td>
+            </tr>`;
+    });
+
+    // Close table and add the total row
+    receiptContent += `
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Total</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">R${total.toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>`;
+
+    // Create params for email sending
+    var params = {
+        name: document.getElementById("name").value,
+        email: recipientEmail, // Use the email from local storage
+        message: receiptContent // Pass the receipt HTML content as the message
+    };
+
+    const serviceID = "service_xyt3jjh";
+    const templateID = "template_bq40ypt";
+
+    emailjs.send(serviceID, templateID, params)
+        .then(res => {
+            document.getElementById("name").value = "";
+            console.log(res);
+            alert("Your receipt was sent successfully!");
+        })
+        .catch(err => console.log(err));
+}
+
+    </script>
+</body>
+</html>

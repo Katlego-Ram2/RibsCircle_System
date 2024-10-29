@@ -286,43 +286,43 @@ nav {
             <h2>Checkout</h2>
             <form id="paymentForm">
                 <label for="name">Name:</label>
-                <input type="text" id="name" required>
+                <input type="text" name="name" id="name" >
                 <br>
                 <label for="email">Email:</label>
-                <input type="email" id="email" required>
+                <input type="email" name="email" id="email" >
                 <br>
                 <label for="paymentMethod">Payment Method:</label>
-                <select id="paymentMethod" required onchange="showPaymentFields()">
+                <select id="paymentMethod"  onchange="showPaymentFields()">
                     <option value="" disabled selected>Select payment method</option>
                     <option value="creditCard" >Credit Card</option>
                     <option value="paypal">PayPal</option>
-                    <option value="bankTransfer">Bank Transfer</option>
+                    <option  value="bankTransfer">Bank Transfer</option>
                 </select>
                 <br>
 
                 <!-- Payment Fields -->
                 <div id="creditCardFields" class="hidden">
                     <label for="cardNumber">Card Number:</label>
-                    <input type="text" id="creditCard" name="creditCard" pattern="\d{16}" title="Please enter a 16-digit credit card number" maxlength="16" required>
+                    <input type="text" id="creditCard" name="creditCard" pattern="\d{16}" title="Please enter a 16-digit credit card number" maxlength="16" >
                     <br>
                     <label for="expiryDate">Expiry Date:</label>
-                    <input type="text" id="expiryDate" placeholder="MM/YY" pattern="^(0[1-9]|1[0-2])\/\d{2}$" title="Please enter a valid expiry date (MM/YY)" required>
+                    <input type="text" id="expiryDate" placeholder="MM/YY" pattern="^(0[1-9]|1[0-2])\/\d{2}$" title="Please enter a valid expiry date (MM/YY)" >
                     <br>
                     <label for="cvv">CVV:</label>
-                    <input type="text" id="cvv" required pattern="\d{3}" title="Please enter a valid 3-digit CVV number">
+                    <input type="text" name="cvv" id="cvv"  pattern="\d{3}" title="Please enter a valid 3-digit CVV number">
                 </div>
 
                 <div id="paypalFields" class="hidden">
                     <label for="paypalEmail">PayPal Email:</label>
-                    <input type="email" id="paypalEmail" required>
+                    <input name="email" type="email" id="paypalEmail" >
                 </div>
 
                 <div id="bankTransferFields" class="hidden">
                     <label for="accountNumber">Account Number:</label>
-                    <input type="text" id="accountNumber" required>
+                    <input type="text" name="accountNum" id="accountNumber" >
                     <br>
                     <label for="bankName">Bank Name:</label>
-                    <input type="text" id="bankName" required>
+                    <input type="text" name="bankName" id="bankName" >
                 </div>
 
                 <?php

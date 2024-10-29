@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us</title>
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("RoymxAPcZ8u5vwOuh");
+        })();
+
+        function sendMail() {
+            // Get user inputs
+            var params = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                message: getInvoiceDetails() // Use invoice details as the message
+            };
+
+            const serviceID = "service_xyt3jjh";
+            const templateID = "template_bq40ypt";
+
+            emailjs.send(serviceID, templateID, params)
+                .then(res => {
+                    // Clear input fields
+                    document.getElementById("name").value = "";
+                    document.getElementById("email").value = "";
+                    alert("Your message sent successfully!!");
+                })
+                .catch(err => console.log(err));
+        }
+
+        // Function to retrieve invoice details from local storage
+        function getInvoiceDetails() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let invoiceDetails = "Invoice Details:\n\n";
+            let total = 0;
+
+            cart.forEach(item => {
+                const price = parseFloat(item.price);
+                const itemTotal = item.quantity * price;
+                total += itemTotal;
+
+                invoiceDetails += `${item.description} (Quantity: ${item.quantity}, Unit Price: R${price.toFixed(2)}, Total: R${itemTotal.toFixed(2)})\n`;
+            });
+
+            invoiceDetails += `\nTotal Amount: R${total.toFixed(2)}`;
+            return invoiceDetails;
+        }
+    </script>
+</head>
+<body>
+    <div class="container border mt-3 bg-light">
+        <div class="row">
+            <div class="col-md-6 p-5 bg-primary text-white">
+                <h1>Hi there!</h1>
+                <h4>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quo,</h4>
+            </div>
+            <div class="col-md-6 border-left py-3">
+                <h1>Contact form</h1>
+                <div class="form-group">
+                    <h5 for="name">Name</h5>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        placeholder="Enter name"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <h5 for="email">Email</h5>
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        placeholder="Enter email"
+                        required
+                    />
+                </div>
+                <button class="btn btn-primary" onclick="sendMail()">Submit Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Section -->
+    <div class="container mt-5">
+        <div class="invoice-header">
+            <h1>Invoice</h1>
+            <p>Date: <span id="invoice-date"></span></p>
+        </div>
+
+        <div class="customer-details">
+            <h3>Customer Details</h3>
+            <p>Name: <span id="customer-name"></span></p>
+            <p>Email: <span id="customer-email"></span></p>
+        </div>
+
+        <table class="table table-bordered invoice-table">
+            <thead>
+                <tr>
+                    <th>Item Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="invoice-items">
+                <!-- Items will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <div class="invoice-footer">
+            <h4>Total Amount: R<span id="total-amount">0.00</span></h4>
+        </div>
+    </div>
+
+    <script>
+        // Function to render invoice
+        function renderInvoice() {
+            document.getElementById('invoice-date').textContent = new Date().toLocaleDateString();
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+
+            document.getElementById('customer-name').textContent = name;
+            document.getElementById('customer-email').textContent = email;
+
+            const invoiceItems = document.getElementById('invoice-items');
+            let total = 0;
+
+            // Retrieve items from local storage
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            cart.forEach(item => {
+                const price = parseFloat(item.price); // Ensure price is a number
+                if (isNaN(price)) {
+                    console.error(`Invalid price for item: ${JSON.stringify(item)}`);
+                    return; // Skip this item if price is not valid
+                }
+
+                const itemTotal = item.quantity * price;
+                total += itemTotal;
+
+                const row = `<tr>
+                    <td>${item.description}</td>
+                    <td>${item.quantity}</td>
+                    <td>R${price.toFixed(2)}</td>
+                    <td>R${itemTotal.toFixed(2)}</td>
+                </tr>`;
+                invoiceItems.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('total-amount').textContent = total.toFixed(2);
+        }
+
+        // Call the function to render the invoice on page load
+        renderInvoice();
+    </script>
+</body>
+</html>

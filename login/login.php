@@ -1,13 +1,14 @@
 <?php
 // login.php
 include '../db_connect.php';
-session_start(); // Start a session
+session_start();
 
 $errors = [];
 $usernameOrEmail = $password = '';
 $borderClass = ['usernameOrEmail' => '', 'password' => ''];
-$userId = null; // Variable to store user ID
-$userRole = null; // Variable to store user role
+$userId = null;
+$userRole = null;
+$userEmail = ''; // Variable to store user email
 
 if (isset($_COOKIE['usernameOrEmail'])) {
     $usernameOrEmail = $_COOKIE['usernameOrEmail'];
@@ -34,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Check credentials if no errors
     if (empty($errors)) {
-        $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ? OR email = ?");
+        $stmt = $conn->prepare("SELECT id, password, email, role FROM users WHERE username = ? OR email = ?");
         $stmt->bind_param("ss", $usernameOrEmail, $usernameOrEmail);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows === 1) {
-            $stmt->bind_result($userId, $hashed_password, $userRole); // Fetch ID and role as well
+            $stmt->bind_result($userId, $hashed_password, $userEmail, $userRole);
             $stmt->fetch();
 
             // Verify password
@@ -55,32 +56,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 // Set cookie for "Remember Me"
                 if ($rememberMe) {
-                    setcookie('usernameOrEmail', $usernameOrEmail, time() + (86400 * 30), "/"); // 30 days
-                    setcookie('password', $password, time() + (86400 * 30), "/"); // 30 days
+                    setcookie('usernameOrEmail', $usernameOrEmail, time() + (86400 * 30), "/");
                 } else {
-                    setcookie('usernameOrEmail', '', time() - 3600, "/"); // Delete cookie
-                    setcookie('password', '', time() - 3600, "/"); // Delete cookie
+                    setcookie('usernameOrEmail', '', time() - 3600, "/");
                 }
 
                 // Prepare JavaScript for local storage
                 $localStorageScript = "<script>
                     localStorage.setItem('userId', '$userId');
                     localStorage.setItem('username', '$usernameOrEmail');
+                    localStorage.setItem('role', '$userRole');
+                    localStorage.setItem('email', '$userEmail');
                 </script>";
 
                 // Redirect based on user role
+                echo $localStorageScript; // Add local storage script
                 if ($userRole === 'customer') {
-                    echo $localStorageScript; // Add local storage script for customers
                     echo "<script>window.location.href = 'http://localhost/RibsCircle_System/index.php';</script>";
                 } elseif ($userRole === 'admin') {
-                    echo "<script>window.location.href = 'http://localhost/RibsCircle_System/admin/index.php';</script>";
+                    echo "<script>window.location.href = 'http://localhost/RibsCircle_System/admin/report.php';</script>";
                 } elseif ($userRole === 'auditor') {
-                    echo "<script>window.location.href = '../RibsCircle_System/auditor/index.php';</script>"; // Adjust auditor path as needed
+                    echo "<script>window.location.href = '../RibsCircle_System/auditor/index.php';</script>";
                 } else {
-                    // Handle unknown roles
                     echo "<script>alert('Unknown role. Please contact support.');</script>";
                 }
-                exit(); // Ensure no further output is sent
+                exit();
             } else {
                 $errors['password'] = "Invalid password.";
                 $borderClass['password'] = 'error';
